@@ -1,34 +1,29 @@
-package com.FabboCassa.Tutorial;
+package com.FabboCassa.Tutorial
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.ApplicationAdapter
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.ScreenUtils
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class TutorialMain extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture image;
+/** [com.badlogic.gdx.ApplicationListener] implementation shared by all platforms.  */
+class TutorialMain : ApplicationAdapter() {
+    private var batch: SpriteBatch? = null
+    private var image: Texture? = null
 
-    @Override
-    public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+    override fun create() {
+        batch = SpriteBatch()
+        image = Texture("libgdx.png")
     }
 
-    @Override
-    public void render() {
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.end();
+    override fun render() {
+        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f)
+        batch!!.begin()
+        batch!!.draw(image, 140f, 210f)
+        batch!!.end()
     }
 
-    @Override
-    public void dispose() {
-        batch.dispose();
-        image.dispose();
+    override fun dispose() {
+        batch!!.dispose()
+        image!!.dispose()
     }
 }
