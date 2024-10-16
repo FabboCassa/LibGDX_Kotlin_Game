@@ -1,29 +1,24 @@
 package com.FabboCassa.Tutorial
 
-import com.badlogic.gdx.ApplicationAdapter
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.ScreenUtils
+import com.FabboCassa.Tutorial.screens.FirstScreen
+import com.FabboCassa.Tutorial.screens.SecondScreen
+import com.badlogic.gdx.Application
+import com.badlogic.gdx.Gdx
+import ktx.app.KtxGame
+import ktx.app.KtxScreen
+import ktx.log.Logger
+import ktx.log.logger
 
-/** [com.badlogic.gdx.ApplicationListener] implementation shared by all platforms.  */
-class TutorialMain : ApplicationAdapter() {
-    private var batch: SpriteBatch? = null
-    private var image: Texture? = null
+
+private val LOG: Logger = logger<TutorialMain>()
+
+class TutorialMain : KtxGame<KtxScreen>() {
 
     override fun create() {
-        batch = SpriteBatch()
-        image = Texture("libgdx.png")
-    }
-
-    override fun render() {
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f)
-        batch!!.begin()
-        batch!!.draw(image, 140f, 210f)
-        batch!!.end()
-    }
-
-    override fun dispose() {
-        batch!!.dispose()
-        image!!.dispose()
+        Gdx.app.logLevel = Application.LOG_DEBUG //needed to see log
+        LOG.debug { "Create game instance" }
+        addScreen(FirstScreen(this))
+        addScreen(SecondScreen(this))
+        setScreen<FirstScreen>()
     }
 }
