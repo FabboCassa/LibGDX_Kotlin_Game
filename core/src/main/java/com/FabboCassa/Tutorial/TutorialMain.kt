@@ -1,5 +1,6 @@
 package com.FabboCassa.Tutorial
 
+import com.FabboCassa.Tutorial.ecs.system.RenderSystem
 import com.FabboCassa.Tutorial.screens.GameScreen
 import com.FabboCassa.Tutorial.screens.TutorialScreens
 import com.badlogic.ashley.core.Engine
@@ -8,6 +9,7 @@ import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
 import ktx.log.Logger
 import ktx.log.logger
@@ -18,8 +20,11 @@ const val UNIT_SCALE = 1 / 16f
 
 class TutorialMain : KtxGame<TutorialScreens>() {
 
+    val gameViewport = FitViewport(9f, 16f) //viewport of the world
     val batch: Batch by lazy { SpriteBatch() } //initialized when needed
-    val engine: Engine by lazy { PooledEngine() } //pooled stops Garbage Collector because entities are pooled and don't trigger garbage
+    val engine: Engine by lazy { PooledEngine().apply {
+        addSystem(RenderSystem(batch, gameViewport))
+    } } //pooled stops Garbage Collector because entities are pooled and don't trigger garbage
 
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG //needed to see log
