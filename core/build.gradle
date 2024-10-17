@@ -14,6 +14,7 @@ dependencies {
   api "io.github.libktx:ktx-app:$ktxVersion"
   api "io.github.libktx:ktx-log:$ktxVersion"
   api "io.github.libktx:ktx-graphics:$ktxVersion"
+  api "io.github.libktx:ktx-ashley:$ktxVersion"
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
