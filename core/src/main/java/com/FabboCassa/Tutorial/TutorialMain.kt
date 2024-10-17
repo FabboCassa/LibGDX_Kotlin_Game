@@ -12,6 +12,7 @@ import ktx.log.logger
 
 
 private val LOG: Logger = logger<TutorialMain>()
+const val UNIT_SCALE = 1 / 16f
 
 class TutorialMain : KtxGame<TutorialScreens>() {
 
