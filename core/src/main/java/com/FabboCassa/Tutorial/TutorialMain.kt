@@ -7,6 +7,7 @@ import com.FabboCassa.Tutorial.ecs.system.DebugSystem
 import com.FabboCassa.Tutorial.ecs.system.MoveSystem
 import com.FabboCassa.Tutorial.ecs.system.PlayerAnimationSystem
 import com.FabboCassa.Tutorial.ecs.system.PlayerInputSystem
+import com.FabboCassa.Tutorial.ecs.system.PowerUpSystem
 import com.FabboCassa.Tutorial.ecs.system.RemoveSystem
 import com.FabboCassa.Tutorial.ecs.system.RenderSystem
 import com.FabboCassa.Tutorial.screens.GameScreen
@@ -40,6 +41,7 @@ class TutorialMain : KtxGame<TutorialScreens>() {
     val engine: Engine by lazy { PooledEngine().apply {
         addSystem(PlayerInputSystem(gameViewport))
         addSystem(MoveSystem())
+        addSystem(PowerUpSystem())
         addSystem(DamageSystem())
         addSystem(PlayerAnimationSystem(graphicsAtlas.findRegion("ship_base"),graphicsAtlas.findRegion("ship_left"),graphicsAtlas.findRegion("ship_right")))
         addSystem(AttachSystem())
