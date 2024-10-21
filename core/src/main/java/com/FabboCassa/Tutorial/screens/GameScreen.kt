@@ -1,9 +1,11 @@
 package com.FabboCassa.Tutorial.screens
 
 import com.FabboCassa.Tutorial.TutorialMain
+import com.FabboCassa.Tutorial.UNIT_SCALE
 import com.FabboCassa.Tutorial.V_WIDTH
 import com.FabboCassa.Tutorial.ecs.component.AnimationComponent
 import com.FabboCassa.Tutorial.ecs.component.AnimationType
+import com.FabboCassa.Tutorial.ecs.component.AttachComponent
 import com.FabboCassa.Tutorial.ecs.component.FacingComponent
 import com.FabboCassa.Tutorial.ecs.component.GraphicComponent
 import com.FabboCassa.Tutorial.ecs.component.MoveComponent
@@ -27,14 +29,23 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game) {
 
     override fun show() {
         LOG.debug { "First screen shown" }
-        engine.entity {
+        val playerShip = engine.entity {
             with<TransformComponent> { //dimesion
-                setInitialPosition(4.5f,8f,0f)
+                setInitialPosition(4.5f,8f,-1f)
             }
             with<MoveComponent>()
             with<GraphicComponent>()
             with<PlayerComponent>()
             with<FacingComponent>()
+        }
+        engine.entity {
+            with<TransformComponent>()
+            with<AttachComponent> {
+                entity = playerShip
+                offset.set(1f * UNIT_SCALE, -6f * UNIT_SCALE)
+            }
+            with<GraphicComponent>()
+            with<AnimationComponent> { type = AnimationType.FIRE }
         }
         engine.entity {
             with<TransformComponent> {

@@ -1,6 +1,7 @@
 package com.FabboCassa.Tutorial
 
 import com.FabboCassa.Tutorial.ecs.system.AnimationSystem
+import com.FabboCassa.Tutorial.ecs.system.AttachSystem
 import com.FabboCassa.Tutorial.ecs.system.DamageSystem
 import com.FabboCassa.Tutorial.ecs.system.DebugSystem
 import com.FabboCassa.Tutorial.ecs.system.MoveSystem
@@ -41,6 +42,7 @@ class TutorialMain : KtxGame<TutorialScreens>() {
         addSystem(MoveSystem())
         addSystem(DamageSystem())
         addSystem(PlayerAnimationSystem(graphicsAtlas.findRegion("ship_base"),graphicsAtlas.findRegion("ship_left"),graphicsAtlas.findRegion("ship_right")))
+        addSystem(AttachSystem())
         addSystem(AnimationSystem(graphicsAtlas))
         addSystem(RenderSystem(batch, gameViewport))
         addSystem(RemoveSystem())
