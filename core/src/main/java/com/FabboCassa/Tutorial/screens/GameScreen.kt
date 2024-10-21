@@ -20,17 +20,32 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game) {
         LOG.debug { "First screen shown" }
         engine.entity {
             with<TransformComponent> {
-                position.set(MathUtils.random(0f, 9f), MathUtils.random(0f, 16f), 0f)
+                position.set(4.5f,8f,0f)
             }
             with<GraphicComponent>()
             with<PlayerComponent>()
             with<FacingComponent>()
         }
+        engine.entity {
+            with<TransformComponent> {
+                position.set(1f,1f, 0f)
+            }
+            with<GraphicComponent>{
+                setSpriteRegion(game.graphicsAtlas.findRegion("ship_left"))
+            }
+        }
+        engine.entity {
+            with<TransformComponent> {
+                position.set(8f,1f, 0f)
+            }
+            with<GraphicComponent>{
+                setSpriteRegion(game.graphicsAtlas.findRegion("ship_right"))
+            }
+        }
     }
 
 
     override fun render(delta: Float) {
-
         engine.update(delta) //time of frame? needed to not have more movement if we have more frame per sec
 
     }

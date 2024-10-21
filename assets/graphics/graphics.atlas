@@ -1,0 +1,9 @@
+graphics.png
+size:64,16
+repeat:none
+ship_base
+bounds:25,1,10,9
+ship_left
+bounds:1,1,10,9
+ship_right
+bounds:13,1,10,9
