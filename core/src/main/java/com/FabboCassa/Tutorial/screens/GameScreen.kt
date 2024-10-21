@@ -1,11 +1,15 @@
 package com.FabboCassa.Tutorial.screens
 
 import com.FabboCassa.Tutorial.TutorialMain
+import com.FabboCassa.Tutorial.V_WIDTH
+import com.FabboCassa.Tutorial.ecs.component.AnimationComponent
+import com.FabboCassa.Tutorial.ecs.component.AnimationType
 import com.FabboCassa.Tutorial.ecs.component.FacingComponent
 import com.FabboCassa.Tutorial.ecs.component.GraphicComponent
 import com.FabboCassa.Tutorial.ecs.component.MoveComponent
 import com.FabboCassa.Tutorial.ecs.component.PlayerComponent
 import com.FabboCassa.Tutorial.ecs.component.TransformComponent
+import com.FabboCassa.Tutorial.ecs.system.DAMAGE_AREA_HEIGHT
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import ktx.ashley.entity
@@ -13,6 +17,7 @@ import ktx.ashley.with
 import ktx.log.Logger
 import ktx.log.logger
 import kotlin.math.min
+import kotlin.reflect.typeOf
 
 private val LOG: Logger = logger<GameScreen>()
 private const val MAX_DELTA_TIME = 1/20f //we define the minimum frame per sec, can't go under 20 frame per second
@@ -23,13 +28,20 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game) {
     override fun show() {
         LOG.debug { "First screen shown" }
         engine.entity {
-            with<TransformComponent> {
+            with<TransformComponent> { //dimesion
                 setInitialPosition(4.5f,8f,0f)
             }
             with<MoveComponent>()
             with<GraphicComponent>()
             with<PlayerComponent>()
             with<FacingComponent>()
+        }
+        engine.entity {
+            with<TransformComponent> {
+                size.set(V_WIDTH.toFloat(), DAMAGE_AREA_HEIGHT)
+            }
+            with<AnimationComponent> { type = AnimationType.DARK_MATTER }
+            with<GraphicComponent>()
         }
     }
 
