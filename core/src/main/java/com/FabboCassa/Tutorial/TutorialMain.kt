@@ -1,5 +1,7 @@
 package com.FabboCassa.Tutorial
 
+import com.FabboCassa.Tutorial.ecs.system.PlayerAnimationSystem
+import com.FabboCassa.Tutorial.ecs.system.PlayerInputSystem
 import com.FabboCassa.Tutorial.ecs.system.RenderSystem
 import com.FabboCassa.Tutorial.screens.GameScreen
 import com.FabboCassa.Tutorial.screens.TutorialScreens
@@ -7,8 +9,10 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
 import ktx.log.Logger
@@ -20,9 +24,15 @@ const val UNIT_SCALE = 1 / 16f
 
 class TutorialMain : KtxGame<TutorialScreens>() {
 
+    private val defaultRegion by lazy {TextureRegion(Texture(Gdx.files.internal("graphics/ship_base.png")))}
+    private val leftRegion by lazy {TextureRegion(Texture(Gdx.files.internal("graphics/ship_left.png")))}
+    private val rightRegion by lazy {TextureRegion(Texture(Gdx.files.internal("graphics/ship_right.png")))}
+
     val gameViewport = FitViewport(9f, 16f) //viewport of the world
     val batch: Batch by lazy { SpriteBatch() } //initialized when needed
     val engine: Engine by lazy { PooledEngine().apply {
+        addSystem(PlayerInputSystem(gameViewport))
+        addSystem(PlayerAnimationSystem(defaultRegion, leftRegion, rightRegion))
         addSystem(RenderSystem(batch, gameViewport))
     } } //pooled stops Garbage Collector because entities are pooled and don't trigger garbage
 
@@ -37,5 +47,9 @@ class TutorialMain : KtxGame<TutorialScreens>() {
         super.dispose()
         LOG.debug { "Sprites in batch : ${(batch as SpriteBatch).maxSpritesInBatch}" }
         batch.dispose()
+
+        defaultRegion.texture.dispose()
+        leftRegion.texture.dispose()
+        rightRegion.texture.dispose()
     }
 }
