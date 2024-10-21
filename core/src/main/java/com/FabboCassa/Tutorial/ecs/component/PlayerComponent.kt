@@ -2,6 +2,7 @@ package com.FabboCassa.Tutorial.ecs.component
 
 import com.badlogic.ashley.core.Component
 import com.badlogic.gdx.utils.Pool
+import ktx.ashley.mapperFor
 
 const val MAX_LIFE = 100f
 const val MAX_SHIELD = 100f
@@ -22,6 +23,6 @@ class PlayerComponent: Component, Pool.Poolable {
     }
 
     companion object {
-
+        val mapper = mapperFor<PlayerComponent>()
     }
 }

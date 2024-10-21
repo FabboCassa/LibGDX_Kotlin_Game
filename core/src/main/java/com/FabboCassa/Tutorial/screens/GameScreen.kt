@@ -3,6 +3,7 @@ package com.FabboCassa.Tutorial.screens
 import com.FabboCassa.Tutorial.TutorialMain
 import com.FabboCassa.Tutorial.ecs.component.FacingComponent
 import com.FabboCassa.Tutorial.ecs.component.GraphicComponent
+import com.FabboCassa.Tutorial.ecs.component.MoveComponent
 import com.FabboCassa.Tutorial.ecs.component.PlayerComponent
 import com.FabboCassa.Tutorial.ecs.component.TransformComponent
 import com.badlogic.gdx.math.MathUtils
@@ -22,25 +23,10 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game) {
             with<TransformComponent> {
                 position.set(4.5f,8f,0f)
             }
+            with<MoveComponent>()
             with<GraphicComponent>()
             with<PlayerComponent>()
             with<FacingComponent>()
-        }
-        engine.entity {
-            with<TransformComponent> {
-                position.set(1f,1f, 0f)
-            }
-            with<GraphicComponent>{
-                setSpriteRegion(game.graphicsAtlas.findRegion("ship_left"))
-            }
-        }
-        engine.entity {
-            with<TransformComponent> {
-                position.set(8f,1f, 0f)
-            }
-            with<GraphicComponent>{
-                setSpriteRegion(game.graphicsAtlas.findRegion("ship_right"))
-            }
         }
     }
 

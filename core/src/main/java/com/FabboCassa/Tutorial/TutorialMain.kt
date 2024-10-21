@@ -1,7 +1,9 @@
 package com.FabboCassa.Tutorial
 
+import com.FabboCassa.Tutorial.ecs.system.MoveSystem
 import com.FabboCassa.Tutorial.ecs.system.PlayerAnimationSystem
 import com.FabboCassa.Tutorial.ecs.system.PlayerInputSystem
+import com.FabboCassa.Tutorial.ecs.system.RemoveSystem
 import com.FabboCassa.Tutorial.ecs.system.RenderSystem
 import com.FabboCassa.Tutorial.screens.GameScreen
 import com.FabboCassa.Tutorial.screens.TutorialScreens
@@ -22,17 +24,21 @@ import ktx.log.logger
 
 private val LOG: Logger = logger<TutorialMain>()
 const val UNIT_SCALE = 1 / 16f
+const val V_WIDTH = 9
+const val V_HEIGHT = 16
 
 class TutorialMain : KtxGame<TutorialScreens>() {
 
     val graphicsAtlas by lazy { TextureAtlas(Gdx.files.internal("graphics/graphics.atlas")) }
 
-    val gameViewport = FitViewport(9f, 16f) //viewport of the world
+    val gameViewport = FitViewport(V_WIDTH.toFloat(), V_HEIGHT.toFloat()) //viewport of the world
     val batch: Batch by lazy { SpriteBatch() } //initialized when needed
     val engine: Engine by lazy { PooledEngine().apply {
         addSystem(PlayerInputSystem(gameViewport))
+        addSystem(MoveSystem())
         addSystem(PlayerAnimationSystem(graphicsAtlas.findRegion("ship_base"),graphicsAtlas.findRegion("ship_left"),graphicsAtlas.findRegion("ship_right")))
         addSystem(RenderSystem(batch, gameViewport))
+        addSystem(RemoveSystem())
     } } //pooled stops Garbage Collector because entities are pooled and don't trigger garbage
 
     override fun create() {
