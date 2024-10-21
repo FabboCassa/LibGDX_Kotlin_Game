@@ -1,5 +1,7 @@
 package com.FabboCassa.Tutorial
 
+import com.FabboCassa.Tutorial.ecs.system.DamageSystem
+import com.FabboCassa.Tutorial.ecs.system.DebugSystem
 import com.FabboCassa.Tutorial.ecs.system.MoveSystem
 import com.FabboCassa.Tutorial.ecs.system.PlayerAnimationSystem
 import com.FabboCassa.Tutorial.ecs.system.PlayerInputSystem
@@ -36,9 +38,11 @@ class TutorialMain : KtxGame<TutorialScreens>() {
     val engine: Engine by lazy { PooledEngine().apply {
         addSystem(PlayerInputSystem(gameViewport))
         addSystem(MoveSystem())
+        addSystem(DamageSystem())
         addSystem(PlayerAnimationSystem(graphicsAtlas.findRegion("ship_base"),graphicsAtlas.findRegion("ship_left"),graphicsAtlas.findRegion("ship_right")))
         addSystem(RenderSystem(batch, gameViewport))
         addSystem(RemoveSystem())
+        addSystem(DebugSystem())
     } } //pooled stops Garbage Collector because entities are pooled and don't trigger garbage
 
     override fun create() {
