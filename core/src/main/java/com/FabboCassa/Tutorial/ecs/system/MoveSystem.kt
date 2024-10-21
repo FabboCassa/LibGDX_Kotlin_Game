@@ -35,8 +35,26 @@ class MoveSystem: IteratingSystem(allOf(TransformComponent::class, MoveComponent
         accumulator += deltaTime
         while(accumulator>= UPDATE_RATE) { //move step by step so we can check
             accumulator -= UPDATE_RATE
+
+            entities.forEach { entity -> //
+                entity[TransformComponent.mapper]?.let { transform ->
+                    transform.prePosition.set(transform.position) //store current position in previous position then update
+                }
+            }
+
             super.update(UPDATE_RATE)
         }
+
+        val alpha = accumulator / UPDATE_RATE //get value between 0 1 is percentage between us and next frame
+        entities.forEach { entity -> //
+            entity[TransformComponent.mapper]?.let { transform ->
+               transform.interpolationPosition.set(
+                   MathUtils.lerp(transform.prePosition.x, transform.position.x, alpha),
+                   MathUtils.lerp(transform.prePosition.y, transform.position.y, alpha),
+                   transform.position.z
+               )
+            }
+        } //interpolation
     }
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val transform = entity[TransformComponent.mapper]

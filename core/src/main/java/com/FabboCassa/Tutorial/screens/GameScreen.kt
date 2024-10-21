@@ -6,13 +6,16 @@ import com.FabboCassa.Tutorial.ecs.component.GraphicComponent
 import com.FabboCassa.Tutorial.ecs.component.MoveComponent
 import com.FabboCassa.Tutorial.ecs.component.PlayerComponent
 import com.FabboCassa.Tutorial.ecs.component.TransformComponent
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.MathUtils
 import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.log.Logger
 import ktx.log.logger
+import kotlin.math.min
 
 private val LOG: Logger = logger<GameScreen>()
+private const val MAX_DELTA_TIME = 1/20f //we define the minimum frame per sec, can't go under 20 frame per second
 
 class GameScreen(game: TutorialMain) : TutorialScreens(game) {
 
@@ -21,7 +24,7 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game) {
         LOG.debug { "First screen shown" }
         engine.entity {
             with<TransformComponent> {
-                position.set(4.5f,8f,0f)
+                setInitialPosition(4.5f,8f,0f)
             }
             with<MoveComponent>()
             with<GraphicComponent>()
@@ -32,7 +35,9 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game) {
 
 
     override fun render(delta: Float) {
-        engine.update(delta) //time of frame? needed to not have more movement if we have more frame per sec
+        (game.batch as SpriteBatch).renderCalls = 0
+        engine.update(min (MAX_DELTA_TIME,delta))// min amount 20, if goes over takes delta otherwie max_delta, avoid "spiral of death"
+        LOG.debug { "Render calls: ${(game.batch as SpriteBatch).renderCalls}" }
 
     }
 

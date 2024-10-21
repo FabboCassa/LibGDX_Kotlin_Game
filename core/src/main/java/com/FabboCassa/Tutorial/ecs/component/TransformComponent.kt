@@ -12,12 +12,21 @@ class TransformComponent: Component, Pool.Poolable, Comparable<TransformComponen
 
     val position = Vector3() //opengl is 3d graphic language
     val size = Vector2(1f,1f)
+    val prePosition = Vector3()
+    val interpolationPosition = Vector3()
     var rotation = 0f
 
     override fun reset() { //reset data added for this component
         position.set(Vector3.Zero)
+        prePosition.set(Vector3.Zero)
+        interpolationPosition.set(Vector3.Zero)
         size.set(1f,1f)
         rotation = 0f  //need to be resetted otherwuise might have strange behavior
+    }
+    fun setInitialPosition(x: Float, y: Float, z: Float) {
+        position.set(x,y,z)
+        prePosition.set(x,y,z)
+        interpolationPosition.set(x,y,z)
     }
 
     override fun compareTo(other: TransformComponent): Int {
