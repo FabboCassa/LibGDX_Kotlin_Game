@@ -3,6 +3,7 @@ package com.FabboCassa.Tutorial
 import com.FabboCassa.Tutorial.ecs.event.GameEventManager
 import com.FabboCassa.Tutorial.ecs.system.AnimationSystem
 import com.FabboCassa.Tutorial.ecs.system.AttachSystem
+import com.FabboCassa.Tutorial.ecs.system.CameraShakeSystem
 import com.FabboCassa.Tutorial.ecs.system.DamageSystem
 import com.FabboCassa.Tutorial.ecs.system.DebugSystem
 import com.FabboCassa.Tutorial.ecs.system.MoveSystem
@@ -21,7 +22,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
 import ktx.log.Logger
@@ -46,18 +46,35 @@ class TutorialMain : KtxGame<TutorialScreens>() {
 
     val gameEventManager = GameEventManager()
 
-    val engine: Engine by lazy { PooledEngine().apply {
-        addSystem(PlayerInputSystem(gameViewport))
-        addSystem(MoveSystem())
-        addSystem(PowerUpSystem(gameEventManager))
-        addSystem(DamageSystem(gameEventManager))
-        addSystem(PlayerAnimationSystem(graphicsAtlas.findRegion("ship_base"),graphicsAtlas.findRegion("ship_left"),graphicsAtlas.findRegion("ship_right")))
-        addSystem(AttachSystem())
-        addSystem(AnimationSystem(graphicsAtlas))
-        addSystem(RenderSystem(batch, gameViewport,uiViewport, backgroundTexture, gameEventManager))
-        addSystem(RemoveSystem())
-        addSystem(DebugSystem())
-    } } //pooled stops Garbage Collector because entities are pooled and don't trigger garbage
+    val engine: Engine by lazy {
+        PooledEngine().apply {
+            addSystem(PlayerInputSystem(gameViewport))
+            addSystem(MoveSystem())
+            addSystem(PowerUpSystem(gameEventManager))
+            addSystem(DamageSystem(gameEventManager))
+            addSystem(CameraShakeSystem(gameViewport.camera, gameEventManager))
+            addSystem(
+                PlayerAnimationSystem(
+                    graphicsAtlas.findRegion("ship_base"),
+                    graphicsAtlas.findRegion("ship_left"),
+                    graphicsAtlas.findRegion("ship_right")
+                )
+            )
+            addSystem(AttachSystem())
+            addSystem(AnimationSystem(graphicsAtlas))
+            addSystem(
+                RenderSystem(
+                    batch,
+                    gameViewport,
+                    uiViewport,
+                    backgroundTexture,
+                    gameEventManager
+                )
+            )
+            addSystem(RemoveSystem())
+            addSystem(DebugSystem())
+        }
+    } //pooled stops Garbage Collector because entities are pooled and don't trigger garbage
 
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG //needed to see log

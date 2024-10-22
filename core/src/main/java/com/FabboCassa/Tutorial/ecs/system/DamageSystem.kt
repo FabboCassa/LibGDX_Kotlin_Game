@@ -41,7 +41,15 @@ class DamageSystem(
                     return
                 }
             }
+
             player.life -= damage
+            gameEventManager.dispatchEvent(GameEvent.PlayerHit.apply {
+                this.player = entity
+                this.life = player.life
+                this.maxLife = player.maxLife
+            })
+
+
             if (player.life <= 0) {
                 //die
                 gameEventManager.dispatchEvent(GameEvent.PlayerDeath.apply {

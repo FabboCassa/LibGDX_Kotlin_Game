@@ -92,6 +92,7 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game), GameEventListener 
             }
 
             GameEvent.CollectPowerUp -> TODO()
+            GameEvent.PlayerHit -> TODO()
         }
     }
 }
