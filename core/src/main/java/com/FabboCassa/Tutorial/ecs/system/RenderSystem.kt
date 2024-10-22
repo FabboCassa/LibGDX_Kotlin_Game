@@ -4,10 +4,8 @@ import com.FabboCassa.Tutorial.ecs.component.GraphicComponent
 import com.FabboCassa.Tutorial.ecs.component.PowerUpType
 import com.FabboCassa.Tutorial.ecs.component.TransformComponent
 import com.FabboCassa.Tutorial.ecs.event.GameEvent
-import com.FabboCassa.Tutorial.ecs.event.GameEventCollectPowerUpEvent
 import com.FabboCassa.Tutorial.ecs.event.GameEventListener
 import com.FabboCassa.Tutorial.ecs.event.GameEventManager
-import com.FabboCassa.Tutorial.ecs.event.GameEventType
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.SortedIteratingSystem
@@ -37,12 +35,12 @@ class RenderSystem(
 
     override fun addedToEngine(engine: Engine?) {
         super.addedToEngine(engine)
-        gameEventManager.addListener(GameEventType.COLLECT_POWER_UP, this)
+        gameEventManager.addListener(GameEvent.CollectPowerUp::class, this)
     }
 
     override fun removedFromEngine(engine: Engine?) {
         super.removedFromEngine(engine)
-        gameEventManager.removeListener(GameEventType.COLLECT_POWER_UP, this)
+        gameEventManager.removeListener(GameEvent.CollectPowerUp::class, this)
     }
 
 
@@ -60,7 +58,10 @@ class RenderSystem(
 
         batch.use(uiViewport.camera.combined) {
             backgroundTexture.run {
-                backgroundScrollSpeed.y = min(-0.25f, backgroundScrollSpeed.y + deltaTime * (1f / 10f)) //goi back to original speed in 10 seconds
+                backgroundScrollSpeed.y = min(
+                    -0.25f,
+                    backgroundScrollSpeed.y + deltaTime * (1f / 10f)
+                ) //goi back to original speed in 10 seconds
                 scroll(backgroundScrollSpeed.x * deltaTime, backgroundScrollSpeed.y * deltaTime)
                 draw(batch)
             }
@@ -105,15 +106,13 @@ class RenderSystem(
 
     }
 
-    override fun onEvent(type: GameEventType, data: GameEvent?) {
-        if (type == GameEventType.COLLECT_POWER_UP) {
-            val eventData = data as GameEventCollectPowerUpEvent
-            if (eventData.type == PowerUpType.SPEED_1) {
-                backgroundScrollSpeed.y -= 0.25f
-            }
-            if (eventData.type == PowerUpType.SPEED_2) {
-                backgroundScrollSpeed.y -= 0.5f
-            }
+    override fun onEvent(event: GameEvent) {
+        val powerUpEvent = event as GameEvent.CollectPowerUp
+        if (powerUpEvent.type == PowerUpType.SPEED_1) {
+            backgroundScrollSpeed.y -= 0.25f
+        }
+        if (powerUpEvent.type == PowerUpType.SPEED_2) {
+            backgroundScrollSpeed.y -= 0.5f
         }
     }
 }

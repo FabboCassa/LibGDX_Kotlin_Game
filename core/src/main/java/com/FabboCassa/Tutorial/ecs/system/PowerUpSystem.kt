@@ -9,9 +9,8 @@ import com.FabboCassa.Tutorial.ecs.component.PowerUpComponent
 import com.FabboCassa.Tutorial.ecs.component.PowerUpType
 import com.FabboCassa.Tutorial.ecs.component.RemoveComponent
 import com.FabboCassa.Tutorial.ecs.component.TransformComponent
-import com.FabboCassa.Tutorial.ecs.event.GameEventCollectPowerUpEvent
+import com.FabboCassa.Tutorial.ecs.event.GameEvent
 import com.FabboCassa.Tutorial.ecs.event.GameEventManager
-import com.FabboCassa.Tutorial.ecs.event.GameEventType
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.MathUtils
@@ -31,10 +30,7 @@ private val LOG = logger<PowerUpSystem>()
 private const val MAX_SPAWN_INTERVAL = 1.5f
 private const val MIN_SPAWN_INTERVAL = 0.9f
 private const val POWER_UP_SPEED = -8.75f
-private const val BOOST_1_SPEED_GAIN = 3f
-private const val BOOST_2_SPEED_GAIN = 3.75f
-private const val LIFE_GAIN = 25f
-private const val SHIELD_GAIN = 25f
+
 
 private class SpawnPattern(
     type1: PowerUpType = PowerUpType.NONE,
@@ -47,7 +43,7 @@ private class SpawnPattern(
 
 class PowerUpSystem(
     private val gameEventManager: GameEventManager
-):
+) :
     IteratingSystem(allOf(PowerUpComponent::class, TransformComponent::class).get()) {
 
     private val playerBoundingRect = Rectangle()
@@ -59,9 +55,21 @@ class PowerUpSystem(
     }
     private var spawnTime = 0f
     private val spawnPatterns = gdxArrayOf(
-        SpawnPattern(type1 = PowerUpType.SPEED_1, type2 = PowerUpType.SPEED_2, type5 = PowerUpType.SHIELD),
-        SpawnPattern(type1 = PowerUpType.SPEED_2, type2 = PowerUpType.LIFE, type5 = PowerUpType.SPEED_1),
-        SpawnPattern(type2 = PowerUpType.SPEED_1, type4 = PowerUpType.SPEED_1, type5 = PowerUpType.SPEED_1),
+        SpawnPattern(
+            type1 = PowerUpType.SPEED_1,
+            type2 = PowerUpType.SPEED_2,
+            type5 = PowerUpType.SHIELD
+        ),
+        SpawnPattern(
+            type1 = PowerUpType.SPEED_2,
+            type2 = PowerUpType.LIFE,
+            type5 = PowerUpType.SPEED_1
+        ),
+        SpawnPattern(
+            type2 = PowerUpType.SPEED_1,
+            type4 = PowerUpType.SPEED_1,
+            type5 = PowerUpType.SPEED_1
+        ),
         SpawnPattern(type2 = PowerUpType.SPEED_1, type4 = PowerUpType.SPEED_1),
         SpawnPattern(
             type1 = PowerUpType.SHIELD,
@@ -114,9 +122,9 @@ class PowerUpSystem(
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val transform = entity[TransformComponent.mapper]
-        require(transform!=null) {"Entity |entity| must have a TransformComponent. entity=$entity"}
+        require(transform != null) { "Entity |entity| must have a TransformComponent. entity=$entity" }
 
-        if (transform.position.y<= 1f) {
+        if (transform.position.y <= 1f) {
             entity.addComponent<RemoveComponent>(engine)
             return
         }
@@ -125,9 +133,10 @@ class PowerUpSystem(
             transform.position.x,
             transform.position.y,
             transform.size.x,
-            transform.size.y)
+            transform.size.y
+        )
 
-        playerEntities.forEach{ player ->
+        playerEntities.forEach { player ->
             player[TransformComponent.mapper]?.let { playerTransform ->
                 playerBoundingRect.set(
                     playerTransform.position.x,
@@ -145,36 +154,23 @@ class PowerUpSystem(
 
     private fun collectPowerUp(player: Entity, powerUpEntity: Entity) {
         val powerUpCmp = powerUpEntity[PowerUpComponent.mapper]
-        require(powerUpCmp!=null) {"Entity |entity| must have a PowerUpComponent. entity=$powerUpEntity"}
+        require(powerUpCmp != null) { "Entity |entity| must have a PowerUpComponent. entity=$powerUpEntity" }
 
-        LOG.debug { "Picking up power up type ${powerUpCmp.type}" }
+        powerUpCmp.type.also { powerUpType ->
 
-        when(powerUpCmp.type) {
-            PowerUpType.SPEED_1 -> {
-                player[MoveComponent.mapper]?.let {it.speed.y += BOOST_1_SPEED_GAIN}
-            }
-            PowerUpType.SPEED_2 -> {
-                player[MoveComponent.mapper]?.let {it.speed.y += BOOST_2_SPEED_GAIN}
-            }
-            PowerUpType.LIFE -> {
-                player[PlayerComponent.mapper]?.let {it.life = min(it.maxLife, it.life+ LIFE_GAIN) }
-            }
-            PowerUpType.SHIELD -> {
-                player[PlayerComponent.mapper]?.let {it.shield +=  min(it.maxShield, it.shield+ SHIELD_GAIN )}
-            }
-            else -> {
-                LOG.error { "Unknown power up type ${powerUpCmp.type}" }
-            }
-        }
+            LOG.debug { "Picking up power up type $powerUpType" }
 
-        gameEventManager.dispatchEvent(
-            GameEventType.COLLECT_POWER_UP,
-            GameEventCollectPowerUpEvent.apply { //notify all listener that listen to power up event
+            player[MoveComponent.mapper]?.let { it.speed.y += powerUpType.speedGain }
+            player[PlayerComponent.mapper]?.let {
+                it.life = min(it.maxLife, it.life + powerUpType.lifeGain)
+                it.shield += min(it.maxShield, it.shield + powerUpType.shieldGain)
+            }
+
+            gameEventManager.dispatchEvent(GameEvent.CollectPowerUp.apply {
                 this.player = player
-                this.type = powerUpCmp.type
-            }
-        )
-
+                this.type = powerUpType
+            })
+        }
         powerUpEntity.addComponent<RemoveComponent>(engine)
 
     }

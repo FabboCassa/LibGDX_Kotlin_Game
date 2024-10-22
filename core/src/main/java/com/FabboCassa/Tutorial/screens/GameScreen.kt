@@ -13,20 +13,17 @@ import com.FabboCassa.Tutorial.ecs.component.PlayerComponent
 import com.FabboCassa.Tutorial.ecs.component.TransformComponent
 import com.FabboCassa.Tutorial.ecs.event.GameEvent
 import com.FabboCassa.Tutorial.ecs.event.GameEventListener
-import com.FabboCassa.Tutorial.ecs.event.GameEventPlayerDeath
-import com.FabboCassa.Tutorial.ecs.event.GameEventType
 import com.FabboCassa.Tutorial.ecs.system.DAMAGE_AREA_HEIGHT
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.math.MathUtils
 import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.log.Logger
 import ktx.log.logger
 import kotlin.math.min
-import kotlin.reflect.typeOf
 
 private val LOG: Logger = logger<GameScreen>()
-private const val MAX_DELTA_TIME = 1/20f //we define the minimum frame per sec, can't go under 20 frame per second
+private const val MAX_DELTA_TIME =
+    1 / 20f //we define the minimum frame per sec, can't go under 20 frame per second
 
 class GameScreen(game: TutorialMain) : TutorialScreens(game), GameEventListener {
 
@@ -34,7 +31,7 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game), GameEventListener 
     override fun show() {
         LOG.debug { "First screen shown" }
 
-        gameEventManager.addListener(GameEventType.PLAYER_DEATH, this)
+        gameEventManager.addListener(GameEvent.PlayerDeath::class, this)
 
         spawnPlayer()
         engine.entity {
@@ -75,7 +72,12 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game), GameEventListener 
 
     override fun render(delta: Float) {
         (game.batch as SpriteBatch).renderCalls = 0
-        engine.update(min (MAX_DELTA_TIME,delta))// min amount 20, if goes over takes delta otherwie max_delta, avoid "spiral of death"
+        engine.update(
+            min(
+                MAX_DELTA_TIME,
+                delta
+            )
+        )// min amount 20, if goes over takes delta otherwie max_delta, avoid "spiral of death"
         LOG.debug { "Render calls: ${(game.batch as SpriteBatch).renderCalls}" }
 
     }
@@ -83,10 +85,13 @@ class GameScreen(game: TutorialMain) : TutorialScreens(game), GameEventListener 
     override fun dispose() {
     }
 
-    override fun onEvent(type: GameEventType, data: GameEvent?) {
-        if(type == GameEventType.PLAYER_DEATH) {
-            val event = data as GameEventPlayerDeath
-            spawnPlayer()
+    override fun onEvent(event: GameEvent) {
+        when (event) {
+            is GameEvent.PlayerDeath -> {
+                spawnPlayer()
+            }
+
+            GameEvent.CollectPowerUp -> TODO()
         }
     }
 }
