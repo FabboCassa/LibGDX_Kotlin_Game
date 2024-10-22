@@ -1,5 +1,7 @@
 package com.FabboCassa.Tutorial
 
+import com.FabboCassa.Tutorial.ecs.asset.TextureAsset
+import com.FabboCassa.Tutorial.ecs.asset.TextureAtlasAsset
 import com.FabboCassa.Tutorial.ecs.event.GameEventManager
 import com.FabboCassa.Tutorial.ecs.system.AnimationSystem
 import com.FabboCassa.Tutorial.ecs.system.AttachSystem
@@ -12,18 +14,18 @@ import com.FabboCassa.Tutorial.ecs.system.PlayerInputSystem
 import com.FabboCassa.Tutorial.ecs.system.PowerUpSystem
 import com.FabboCassa.Tutorial.ecs.system.RemoveSystem
 import com.FabboCassa.Tutorial.ecs.system.RenderSystem
-import com.FabboCassa.Tutorial.screens.GameScreen
+import com.FabboCassa.Tutorial.screens.LoadingScreen
 import com.FabboCassa.Tutorial.screens.TutorialScreens
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
+import ktx.assets.async.AssetStorage
+import ktx.async.KtxAsync
 import ktx.log.Logger
 import ktx.log.logger
 
@@ -38,8 +40,11 @@ const val V_HEIGHT_PIXELS = 240
 class TutorialMain : KtxGame<TutorialScreens>() {
 
     val uiViewport = FitViewport(V_WIDTH_PIXELS.toFloat(), V_HEIGHT_PIXELS.toFloat())
-    val graphicsAtlas by lazy { TextureAtlas(Gdx.files.internal("graphics/graphics.atlas")) }
-    val backgroundTexture by lazy { Texture(Gdx.files.internal("graphics/background.png")) }
+
+    val assets: AssetStorage by lazy {
+        KtxAsync.initiate()
+        AssetStorage() //default behaviour with 2/3 threads
+    }
 
     val gameViewport = FitViewport(V_WIDTH.toFloat(), V_HEIGHT.toFloat()) //viewport of the world
     val batch: Batch by lazy { SpriteBatch() } //initialized when needed
@@ -48,6 +53,9 @@ class TutorialMain : KtxGame<TutorialScreens>() {
 
     val engine: Engine by lazy {
         PooledEngine().apply {
+            val graphicsAtlas = assets[TextureAtlasAsset.GAME_GRAPHICS.descriptor]
+            val backgroundTexture = assets[TextureAsset.BACKGROUND.descriptor]
+
             addSystem(PlayerInputSystem(gameViewport))
             addSystem(MoveSystem())
             addSystem(PowerUpSystem(gameEventManager))
@@ -79,15 +87,14 @@ class TutorialMain : KtxGame<TutorialScreens>() {
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG //needed to see log
         LOG.debug { "Create game instance" }
-        addScreen(GameScreen(this))
-        setScreen<GameScreen>()
+        addScreen(LoadingScreen(this))
+        setScreen<LoadingScreen>()
     }
 
     override fun dispose() { //to track number of batch sprites to improve memory usage
         super.dispose()
         LOG.debug { "Sprites in batch : ${(batch as SpriteBatch).maxSpritesInBatch}" }
         batch.dispose()
-        backgroundTexture.dispose()
-        graphicsAtlas.dispose()
+        assets.dispose()
     }
 }

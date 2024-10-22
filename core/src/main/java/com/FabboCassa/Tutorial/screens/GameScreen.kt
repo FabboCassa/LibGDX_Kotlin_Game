@@ -14,6 +14,7 @@ import com.FabboCassa.Tutorial.ecs.component.TransformComponent
 import com.FabboCassa.Tutorial.ecs.event.GameEvent
 import com.FabboCassa.Tutorial.ecs.event.GameEventListener
 import com.FabboCassa.Tutorial.ecs.system.DAMAGE_AREA_HEIGHT
+import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import ktx.ashley.entity
 import ktx.ashley.with
@@ -25,7 +26,7 @@ private val LOG: Logger = logger<GameScreen>()
 private const val MAX_DELTA_TIME =
     1 / 20f //we define the minimum frame per sec, can't go under 20 frame per second
 
-class GameScreen(game: TutorialMain) : TutorialScreens(game), GameEventListener {
+class GameScreen(game: TutorialMain, private val engine: Engine = game.engine) : TutorialScreens(game), GameEventListener {
 
 
     override fun show() {
