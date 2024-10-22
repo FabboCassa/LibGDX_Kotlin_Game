@@ -31,10 +31,14 @@ private val LOG: Logger = logger<TutorialMain>()
 const val UNIT_SCALE = 1 / 16f
 const val V_WIDTH = 9
 const val V_HEIGHT = 16
+const val V_WIDTH_PIXELS = 135
+const val V_HEIGHT_PIXELS = 240
 
 class TutorialMain : KtxGame<TutorialScreens>() {
 
+    val uiViewport = FitViewport(V_WIDTH_PIXELS.toFloat(), V_HEIGHT_PIXELS.toFloat())
     val graphicsAtlas by lazy { TextureAtlas(Gdx.files.internal("graphics/graphics.atlas")) }
+    val backgroundTexture by lazy { Texture(Gdx.files.internal("graphics/background.png")) }
 
     val gameViewport = FitViewport(V_WIDTH.toFloat(), V_HEIGHT.toFloat()) //viewport of the world
     val batch: Batch by lazy { SpriteBatch() } //initialized when needed
@@ -46,7 +50,7 @@ class TutorialMain : KtxGame<TutorialScreens>() {
         addSystem(PlayerAnimationSystem(graphicsAtlas.findRegion("ship_base"),graphicsAtlas.findRegion("ship_left"),graphicsAtlas.findRegion("ship_right")))
         addSystem(AttachSystem())
         addSystem(AnimationSystem(graphicsAtlas))
-        addSystem(RenderSystem(batch, gameViewport))
+        addSystem(RenderSystem(batch, gameViewport,uiViewport, backgroundTexture))
         addSystem(RemoveSystem())
         addSystem(DebugSystem())
     } } //pooled stops Garbage Collector because entities are pooled and don't trigger garbage
@@ -62,6 +66,7 @@ class TutorialMain : KtxGame<TutorialScreens>() {
         super.dispose()
         LOG.debug { "Sprites in batch : ${(batch as SpriteBatch).maxSpritesInBatch}" }
         batch.dispose()
+        backgroundTexture.dispose()
         graphicsAtlas.dispose()
     }
 }

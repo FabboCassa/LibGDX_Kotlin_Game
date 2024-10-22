@@ -10,9 +10,11 @@ abstract class TutorialScreens (
     val game: TutorialMain,
     val batch: Batch = game.batch,
     val engine: Engine= game.engine,
-    val gameViewport: Viewport = game.gameViewport
+    val gameViewport: Viewport = game.gameViewport,
+    val uiViewport: Viewport = game.uiViewport
 ) : KtxScreen{
     override fun resize(width: Int, height: Int) {
         gameViewport.update(width, height, true)
+        uiViewport.update(width, height, true)
     }
 }
