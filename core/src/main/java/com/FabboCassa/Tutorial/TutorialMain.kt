@@ -1,5 +1,6 @@
 package com.FabboCassa.Tutorial
 
+import com.FabboCassa.Tutorial.ecs.event.GameEventManager
 import com.FabboCassa.Tutorial.ecs.system.AnimationSystem
 import com.FabboCassa.Tutorial.ecs.system.AttachSystem
 import com.FabboCassa.Tutorial.ecs.system.DamageSystem
@@ -42,15 +43,18 @@ class TutorialMain : KtxGame<TutorialScreens>() {
 
     val gameViewport = FitViewport(V_WIDTH.toFloat(), V_HEIGHT.toFloat()) //viewport of the world
     val batch: Batch by lazy { SpriteBatch() } //initialized when needed
+
+    val gameEventManager = GameEventManager()
+
     val engine: Engine by lazy { PooledEngine().apply {
         addSystem(PlayerInputSystem(gameViewport))
         addSystem(MoveSystem())
-        addSystem(PowerUpSystem())
-        addSystem(DamageSystem())
+        addSystem(PowerUpSystem(gameEventManager))
+        addSystem(DamageSystem(gameEventManager))
         addSystem(PlayerAnimationSystem(graphicsAtlas.findRegion("ship_base"),graphicsAtlas.findRegion("ship_left"),graphicsAtlas.findRegion("ship_right")))
         addSystem(AttachSystem())
         addSystem(AnimationSystem(graphicsAtlas))
-        addSystem(RenderSystem(batch, gameViewport,uiViewport, backgroundTexture))
+        addSystem(RenderSystem(batch, gameViewport,uiViewport, backgroundTexture, gameEventManager))
         addSystem(RemoveSystem())
         addSystem(DebugSystem())
     } } //pooled stops Garbage Collector because entities are pooled and don't trigger garbage

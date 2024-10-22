@@ -1,6 +1,7 @@
 package com.FabboCassa.Tutorial.screens
 
 import com.FabboCassa.Tutorial.TutorialMain
+import com.FabboCassa.Tutorial.ecs.event.GameEventManager
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.viewport.Viewport
@@ -11,7 +12,8 @@ abstract class TutorialScreens (
     val batch: Batch = game.batch,
     val engine: Engine= game.engine,
     val gameViewport: Viewport = game.gameViewport,
-    val uiViewport: Viewport = game.uiViewport
+    val uiViewport: Viewport = game.uiViewport,
+    val gameEventManager: GameEventManager = game.gameEventManager
 ) : KtxScreen{
     override fun resize(width: Int, height: Int) {
         gameViewport.update(width, height, true)

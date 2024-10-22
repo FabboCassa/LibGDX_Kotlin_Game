@@ -9,6 +9,9 @@ import com.FabboCassa.Tutorial.ecs.component.PowerUpComponent
 import com.FabboCassa.Tutorial.ecs.component.PowerUpType
 import com.FabboCassa.Tutorial.ecs.component.RemoveComponent
 import com.FabboCassa.Tutorial.ecs.component.TransformComponent
+import com.FabboCassa.Tutorial.ecs.event.GameEventCollectPowerUpEvent
+import com.FabboCassa.Tutorial.ecs.event.GameEventManager
+import com.FabboCassa.Tutorial.ecs.event.GameEventType
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.MathUtils
@@ -42,7 +45,9 @@ private class SpawnPattern(
     val typesArray: GdxArray<PowerUpType> = gdxArrayOf(type1, type2, type3, type4, type5)
 )
 
-class PowerUpSystem :
+class PowerUpSystem(
+    private val gameEventManager: GameEventManager
+):
     IteratingSystem(allOf(PowerUpComponent::class, TransformComponent::class).get()) {
 
     private val playerBoundingRect = Rectangle()
@@ -161,6 +166,14 @@ class PowerUpSystem :
                 LOG.error { "Unknown power up type ${powerUpCmp.type}" }
             }
         }
+
+        gameEventManager.dispatchEvent(
+            GameEventType.COLLECT_POWER_UP,
+            GameEventCollectPowerUpEvent.apply { //notify all listener that listen to power up event
+                this.player = player
+                this.type = powerUpCmp.type
+            }
+        )
 
         powerUpEntity.addComponent<RemoveComponent>(engine)
 
