@@ -1,5 +1,6 @@
 package com.FabboCassa.DarkMatter
 
+import com.FabboCassa.DarkMatter.ecs.asset.MusicAsset
 import com.FabboCassa.DarkMatter.ecs.asset.TextureAsset
 import com.FabboCassa.DarkMatter.ecs.asset.TextureAtlasAsset
 import com.FabboCassa.DarkMatter.ecs.audio.DefaultAudioService
@@ -44,7 +45,7 @@ class DarkMatterMain : KtxGame<DarkMatterScreens>() {
 
     val assets: AssetStorage by lazy {
         KtxAsync.initiate()
-        AssetStorage() //default behaviour with 2/3 threads
+        AssetStorage() //default behaviour with 1 thread
     }
 
     val gameViewport = FitViewport(V_WIDTH.toFloat(), V_HEIGHT.toFloat()) //viewport of the world
@@ -53,8 +54,10 @@ class DarkMatterMain : KtxGame<DarkMatterScreens>() {
     val gameEventManager = GameEventManager()
 
     val audioService by lazy { DefaultAudioService(assets) }
+    val preferences by lazy { Gdx.app.getPreferences("dark-matter") }//pass name of preference, if exists load it otherwise create
 
     val engine: Engine by lazy {
+
         PooledEngine().apply {
             val graphicsAtlas = assets[TextureAtlasAsset.GAME_GRAPHICS.descriptor]
             val backgroundTexture = assets[TextureAsset.BACKGROUND.descriptor]
@@ -97,6 +100,9 @@ class DarkMatterMain : KtxGame<DarkMatterScreens>() {
     override fun dispose() { //to track number of batch sprites to improve memory usage
         super.dispose()
         LOG.debug { "Sprites in batch : ${(batch as SpriteBatch).maxSpritesInBatch}" }
+        MusicAsset.values().forEach {
+            LOG.debug { "Recount $it : ${assets.getReferenceCount(it.descriptor)}" }
+        }
         batch.dispose()
         assets.dispose()
     }

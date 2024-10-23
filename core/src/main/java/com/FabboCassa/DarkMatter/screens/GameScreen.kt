@@ -21,6 +21,9 @@ import ktx.ashley.entity
 import ktx.ashley.with
 import ktx.log.Logger
 import ktx.log.logger
+import ktx.preferences.flush
+import ktx.preferences.get
+import ktx.preferences.set
 import kotlin.math.min
 
 private val LOG: Logger = logger<GameScreen>()
@@ -32,6 +35,8 @@ class GameScreen(game: DarkMatterMain, private val engine: Engine = game.engine)
 
     override fun show() {
         LOG.debug { "First screen shown" }
+        val highScore = preferences["highscore",0f]
+        LOG.debug { "$highScore" }
 
         gameEventManager.addListener(GameEvent.PlayerDeath::class, this)
 
@@ -82,7 +87,7 @@ class GameScreen(game: DarkMatterMain, private val engine: Engine = game.engine)
             )
         )// min amount 20, if goes over takes delta otherwie max_delta, avoid "spiral of death"
         audioService.update()
-        LOG.debug { "Render calls: ${(game.batch as SpriteBatch).renderCalls}" }
+        //LOG.debug { "Render calls: ${(game.batch as SpriteBatch).renderCalls}" }
 
     }
 
@@ -92,6 +97,10 @@ class GameScreen(game: DarkMatterMain, private val engine: Engine = game.engine)
     override fun onEvent(event: GameEvent) {
         when (event) {
             is GameEvent.PlayerDeath -> {
+                LOG.debug { "Player died with distance of ${event.distance}" }
+                preferences.flush {
+                    this["highscore"] = event.distance
+                }
                 spawnPlayer()
             }
 
